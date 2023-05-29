@@ -10,6 +10,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from rest_framework.parsers import JSONParser
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from twitter.models import Publicacao
 from twitter.serializers import PublicacaoSerializer
 from rest_framework.views import APIView
@@ -42,8 +43,6 @@ class RegisterView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST) 
 
 class LoginView(APIView):
-
-
     def post(self, request):
         try:
             data = request.data
@@ -64,13 +63,20 @@ class LoginView(APIView):
                     'message': 'alguma coisa deu errado'
                 }, status = status.HTTP_400_BAD_REQUEST)
 
+
 class PubList(generics.ListCreateAPIView):
-    queryset = Publicacao.objects.all()[:10]
+    # queryset = Publicacao.objects.all()[:10]
     serializer_class = PublicacaoSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     def perform_create(self, serializer):
         serializer.save(autor=self.request.user)
+
+    def get_queryset(self):
+        queryset = Publicacao.objects.all()
+        # Filtra os objetos excluindo o usuário logado atualmente
+        queryset = queryset.exclude(autor=self.request.user)
+        return queryset
 
 class PubDetalhe(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
@@ -88,7 +94,7 @@ class AdicionarPub(APIView):
     def post(self, request):
         try:
             data = request.data
-            print(request.user)
+            data['autor'] = request.user.id
             print(data)
             # data['autor'] = request.user
             serializer = PublicacaoSerializer(data = data)
@@ -114,21 +120,27 @@ class AdicionarPub(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @csrf_exempt
-# def list_pub(request):
-#     if request.method == 'GET':
-#         pubs = Publicacao.objects.all()
-#         serializer = PublicacaoSerializer(pubs, many=True)
-#         print(JsonResponse(serializer.data, safe=False))
-#         return JsonResponse(serializer.data, safe=False)
+@csrf_exempt
+@api_view(['GET','POST'])
+# @authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def list_pub(request):
+    if request.method == 'GET':
+        pubs = Publicacao.objects.all()
+        serializer = PublicacaoSerializer(pubs, many=True)
+        print(JsonResponse(serializer.data, safe=False))
+        return JsonResponse(serializer.data, safe=False)
 
-#     elif request.method == 'POST':
-#         data = JSONParser().parse(request)
-#         serializer = PublicacaoSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return JsonResponse(serializer.data, status=201)
-#         return JsonResponse(serializer.errors, status=400)
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        print(request.user.id)
+        data['autor'] = request.user.id
+        print(data)
+        serializer = PublicacaoSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
     
 
 # @csrf_exempt

@@ -56,7 +56,7 @@ class PublicacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publicacao
         fields = ['id', 'conteudo', 'data_criacao', 'autor']
-    autor = serializers.ReadOnlyField(source='autor.username')
+    # autor = serializers.ReadOnlyField(source='autor.username')
     
     
     # id = serializers.IntegerField(read_only=True)

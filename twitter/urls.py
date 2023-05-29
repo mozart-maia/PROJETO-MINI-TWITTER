@@ -10,5 +10,6 @@ urlpatterns = [
     path('detalhe/<int:pk>/', views.PubDetalhe.as_view()),
     path('registrar/', views.RegisterView.as_view()),
     path('login/', views.LoginView.as_view()),
-    path('tweetar/', views.AdicionarPub.as_view()),
+    # path('tweetar/', views.AdicionarPub.as_view()),
+    path('tweetar/', views.list_pub),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
