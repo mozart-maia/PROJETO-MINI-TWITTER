@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'twitter.apps.TwitterConfig'
+    'rest_framework_simplejwt',
+    'twitter'
     
 ]
 
@@ -53,12 +54,12 @@ REST_FRAMEWORK = {
     
 }
 
-JWT_AUTH = {
-    # how long the original token is valid for
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
-    'JWT_EXPIRATION_DELTA': timedelta(days=2),
-    "SIGNING_KEY": SECRET_KEY,
-}
+# JWT_AUTH = {
+#     # how long the original token is valid for
+#     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
+#     'JWT_EXPIRATION_DELTA': timedelta(days=2),
+#     "SIGNING_KEY": SECRET_KEY,
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

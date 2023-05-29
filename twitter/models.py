@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Publicacao(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     conteudo = models.CharField(max_length=280, blank=True, default='')
-    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    autor = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ['data_criacao'] 
